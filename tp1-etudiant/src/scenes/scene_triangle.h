@@ -17,7 +17,7 @@ public:
 private:
     BufferObject m_triangleBuffer;
     VertexArrayObject m_triangleVao;
-    //DrawArraysCommand m_triangleDraw;
+    DrawArraysCommand m_triangleDraw;
 };
 
 #endif // SCENE_TRIANGLE_H

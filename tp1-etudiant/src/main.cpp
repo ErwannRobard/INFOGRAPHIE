@@ -22,7 +22,7 @@ void printGLInfo();
 
 int main(int argc, char* argv[])
 {
-    const bool VSYNC = false;
+    const bool VSYNC = true; //sinon ca va trop vite si plus de frames
     Window w;
     if (!w.init(VSYNC))
         return -1;
@@ -53,6 +53,9 @@ int main(int argc, char* argv[])
     // TODO - couleur de remplissage suite au nettoyage de l'écran
     //      - test de profondeur
     
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+
     const char* const SCENE_NAMES[] = {
         "First Triangle",
         "First Square",
@@ -74,6 +77,7 @@ int main(int argc, char* argv[])
             glViewport(0, 0, w.getWidth(), w.getHeight());
         
         // TODO nettoyage des tampons appropriés
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         ImGui::Begin("Scene Parameters");
         ImGui::Combo("Scene", &currentScene, SCENE_NAMES, N_SCENE_NAMES);

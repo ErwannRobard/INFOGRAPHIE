@@ -3,32 +3,51 @@
 
 const GLfloat triVertices[] = {
     // TODO
-    0.f
+    -0.5f, -0.5f,
+     0.5f, -0.5f,
+     0.0f, 0.5f
 };
 
 const GLfloat squareVertices[] = {
     // TODO
-    0.f
+    -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
+    -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+
+    -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
+     0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f,  0.0f, 1.0f, 0.0f
 };
 
 const GLfloat colorTriVertices[] = {
     // TODO
-    0.f
+    -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,
+    0.5f, -0.5f,    0.0f, 1.0f, 0.0f,
+    0.0f, 0.5f,     0.0f, 0.0f, 1.0f
 };
 
-const GLfloat colorSquareVertices[] = {
+const GLfloat colorSquareVertices[] = { //2 fois plus de points ici (1 carre = 2 triangles)
     // TODO
-    0.f
+    -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
+    -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+
+    -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
+     0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f,  0.0f, 1.0f, 0.0f
 };
 
 
 const GLfloat colorSquareVerticesReduced[] = {
     // TODO
-    0.f
+    -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f,   0.0f, 1.0f, 0.0f,
+     0.5f, 0.5f,    0.0f, 0.0f, 1.0f,
+    -0.5f, 0.5f,    0.0f, 1.0f, 1.0f
 };
 const GLubyte indexes[] = {
     // TODO
-    0
+    0, 1, 2, 2, 3, 0
 };
 
 

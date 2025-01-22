@@ -16,7 +16,7 @@ public:
     
 private:
     VertexArrayObject m_coloredTriangleVao;
-    //DrawArraysCommand m_coloredTriangleDraw;
+    DrawArraysCommand m_coloredTriangleDraw;
 };
 
 #endif // SCENE_COLORED_TRIANGLE_H

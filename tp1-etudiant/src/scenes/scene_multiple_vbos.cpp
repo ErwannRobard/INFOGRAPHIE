@@ -19,10 +19,10 @@ void SceneMultipleVbos::run(Window& w)
     changeRGB(&m_onlyColorTriVertices[3]);
     changeRGB(&m_onlyColorTriVertices[6]);
     // TODO mise a jour de la couleur
-    
+
     // TODO mise a jour de la position
-	// Faire attention au nombre de composantes (modifier la méthode au besoin)
-	GLfloat* posPtr = nullptr;
+	    // Faire attention au nombre de composantes (modifier la méthode au besoin)
+        GLfloat* posPtr = nullptr;
     changePos(posPtr, m_positionX, m_positionY, m_deltaX, m_deltaY);
 
     // TODO dessin

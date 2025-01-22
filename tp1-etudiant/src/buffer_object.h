@@ -7,6 +7,7 @@ class BufferObject
 {
 public:
     BufferObject();
+    BufferObject(GLenum type);
     BufferObject(GLenum type, GLsizeiptr dataSize, const void* data, GLenum usage);
     ~BufferObject();
 
@@ -16,8 +17,7 @@ public:
     
     void* mapBuffer();
     void unmapBuffer();
-    
-private:    
+     
     void allocate(GLenum type, GLsizeiptr dataSize, const void* data, GLenum usage);
     
 private:

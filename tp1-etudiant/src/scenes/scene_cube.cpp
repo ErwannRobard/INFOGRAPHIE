@@ -14,6 +14,6 @@ SceneCube::SceneCube(Resources& res)
 void SceneCube::run(Window& w)
 {
     m_rotationAngleDegree += 0.5f;
-	// TODO
+	    // TODO
 }
 

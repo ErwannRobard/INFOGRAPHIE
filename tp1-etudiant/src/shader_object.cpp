@@ -2,19 +2,25 @@
 
 #include <iostream>
 
-ShaderObject::ShaderObject(GLenum type, const char* code)
+ShaderObject::ShaderObject(GLenum type, const char* code) : m_id(glCreateShader(type))
 {
-    // TODO
+    // TODO (ndc 2 page 63)
+    glShaderSource(m_id, 1, &code, NULL);
+    glCompileShader(m_id);
+
+    checkCompilingError();
 }
     
 ShaderObject::~ShaderObject()
 {
-    // TODO
+    // TODO (suppression du shader)
+    glDeleteShader(m_id);
 }
 
 GLuint ShaderObject::id()
 {
     // TODO
+    return m_id;
 }
 
 void ShaderObject::checkCompilingError()

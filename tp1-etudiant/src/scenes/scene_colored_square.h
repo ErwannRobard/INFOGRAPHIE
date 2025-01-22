@@ -17,7 +17,7 @@ public:
 private:
     BufferObject m_coloredSquareBuffer;
     VertexArrayObject m_coloredSquareVao;
-    //DrawArraysCommand m_coloredSquareDraw;
+    DrawArraysCommand m_coloredSquareDraw;
 };
 
 #endif // SCENE_COLORED_SQUARE_H

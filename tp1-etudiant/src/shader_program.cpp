@@ -3,7 +3,7 @@
 #include <iostream>
 #include "shader_object.h"
 
-ShaderProgram::ShaderProgram()
+ShaderProgram::ShaderProgram() : m_id(glCreateProgram())
 {
     // TODO
 }
@@ -11,26 +11,33 @@ ShaderProgram::ShaderProgram()
 ShaderProgram::~ShaderProgram()
 {        
     // TODO
+    glDeleteProgram(m_id);
 }
     
 void ShaderProgram::use()
 {
     // TODO
+    glUseProgram(m_id);
 }
     
 void ShaderProgram::attachShaderObject(ShaderObject& s)
 {        
     // TODO
+    glAttachShader(m_id, s.id());
 }
     
 void ShaderProgram::link()
 {
     // TODO
+    glLinkProgram(m_id);
+
+    checkLinkingError();
 }
 
 GLint ShaderProgram::getUniformLoc(const char* name)
 {
     // TODO
+    return glGetUniformLocation(m_id, name);
 }
     
 void ShaderProgram::checkLinkingError()

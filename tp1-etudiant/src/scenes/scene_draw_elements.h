@@ -16,7 +16,7 @@ public:
     
 private:
     VertexArrayObject m_coloredSquareReduceVao;
-    //DrawElementsCommand m_coloredSquareReduceDraw;
+    // DrawElementsCommand m_coloredSquareReduceDraw;
 };
 
 #endif // SCENE_DRAW_ELEMENTS_H

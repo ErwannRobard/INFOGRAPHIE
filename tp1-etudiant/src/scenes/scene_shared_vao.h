@@ -19,8 +19,8 @@ public:
     
 private:
     VertexArrayObject m_sharedVao;
-    //DrawArraysCommand m_coloredTriangleSharedDraw;
-    //DrawElementsCommand m_coloredSquareSharedDraw;
+    // DrawArraysCommand m_coloredTriangleSharedDraw;
+    // DrawElementsCommand m_coloredSquareSharedDraw;
 };
 
 #endif // SCENE_SHARED_VAO_H

@@ -17,7 +17,7 @@ public:
 private:
     BufferObject m_squareBuffer;
     VertexArrayObject m_squareVao;
-    //DrawArraysCommand m_squareDraw;
+    DrawArraysCommand m_squareDraw;
 };
 
 #endif // SCENE_SQUARE_H

@@ -13,7 +13,7 @@ public:
     
     void setCount(GLsizei count);
 private:
-    //VertexArrayObject& m_vao;
+    VertexArrayObject& m_vao;
     GLsizei m_count;
 };
 
@@ -26,7 +26,7 @@ public:
     
     void setCount(GLsizei count);
 private:
-    //VertexArrayObject& m_vao;
+    VertexArrayObject& m_vao;
     GLsizei m_count;
     GLenum m_type;
 };

@@ -14,8 +14,19 @@ public:
     ShaderProgram basic;
     ShaderProgram color;
     
-    ShaderProgram transform; 
-    GLint mvpLocation;
+    ShaderProgram transformColor; 
+    GLint mvpLocationColor;
+
+    ShaderProgram transformSolid; 
+    GLint mvpLocationSolid;
+    GLint locationColorSolid;
+
+    ShaderProgram transformColorAttrib;
+    GLint mvpLocationTransformColorAttrib;
+
+    ShaderProgram transformSolidColor;
+    GLint mvpLocationTransformSolidColor;
+    GLint colorLocationTransformSolidColor;
     
     // Buffer Objects    
     BufferObject coloredTriangleBuffer;
@@ -23,8 +34,8 @@ public:
     BufferObject coloredSquareReduceBuffer;
     BufferObject coloredSquareReduceIndicesBuffer;
 
-private:    
     void initShaderProgram(ShaderProgram& program, const char* vertexSrcPath, const char* fragmentSrcPath);
+private:    
     
 };
 
