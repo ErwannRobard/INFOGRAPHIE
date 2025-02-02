@@ -13,9 +13,7 @@ SceneMultipleVbos::SceneMultipleVbos(Resources& res)
 , m_coloredTriangleColorBuffer(GL_ARRAY_BUFFER, sizeof(m_onlyColorTriVertices), m_onlyColorTriVertices, GL_DYNAMIC_DRAW)
 , m_coloredTriangleMultipleVbosDraw(m_coloredTriangleMultipleVbosVao, 3)
 {
-    // TODO binding vao, done later inside specifyAttribute() but safer
-    m_coloredTriangleMultipleVbosVao.bind();
-
+    // TODO
     //moving triangle's vertext coordinates, no transformation so const
     const GLfloat movingTriPositions[] = {
         -0.5f, -0.5f, 0.0f,
@@ -58,7 +56,6 @@ void SceneMultipleVbos::run(Window& w)
     m_resources.color.use();
 
     //bind vao in run, draw then unbind after
-    m_coloredTriangleMultipleVbosVao.bind(); //might be overkill but safer 
     m_coloredTriangleMultipleVbosDraw.draw();
     m_coloredTriangleMultipleVbosVao.unbind();
 }

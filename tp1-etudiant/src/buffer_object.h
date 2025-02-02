@@ -17,6 +17,8 @@ public:
     
     void* mapBuffer();
     void unmapBuffer();
+
+    GLuint getId();
      
     void allocate(GLenum type, GLsizeiptr dataSize, const void* data, GLenum usage);
     

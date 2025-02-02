@@ -1,5 +1,5 @@
 #include "draw_commands.h"
-
+#include <cstdio>
 
 DrawArraysCommand::DrawArraysCommand(VertexArrayObject& vao, GLsizei count) : m_vao(vao), m_count(count)
 {
@@ -19,14 +19,15 @@ void DrawArraysCommand::setCount(GLsizei count)
     m_count = count;
 }
 
-DrawElementsCommand::DrawElementsCommand(VertexArrayObject& vao, GLsizei count, GLenum type) : m_vao(vao), m_count(count), m_type(type)
+DrawElementsCommand::DrawElementsCommand(VertexArrayObject& vao, GLsizei count, GLenum type) 
+: m_vao(vao), m_count(count), m_type(type)
 {
-    // TODO
+    // TODOx
 }
 
 void DrawElementsCommand::draw()
 {
-    // TODO (ndc 2 p.33)
+    // // TODO (ndc 2 p.33)
     m_vao.bind();
     glDrawElements(GL_TRIANGLES, m_count, m_type, nullptr);
 }

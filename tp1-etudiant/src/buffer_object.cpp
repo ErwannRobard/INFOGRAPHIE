@@ -21,6 +21,12 @@ BufferObject::~BufferObject()
     }
 }
 
+
+GLuint BufferObject::getId(){
+    return m_id;
+}
+
+
 void BufferObject::bind()
 {
     // TODO

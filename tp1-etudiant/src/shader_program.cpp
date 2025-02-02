@@ -14,6 +14,14 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(m_id);
 }
     
+////////////
+GLuint ShaderProgram::getId(){
+    return m_id;
+}
+
+///////////
+
+
 void ShaderProgram::use()
 {
     // TODO

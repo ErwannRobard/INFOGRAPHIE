@@ -11,6 +11,17 @@ Resources::Resources()
     // TODO
     initShaderProgram(basic, "./shaders/basic.vs.glsl", "./shaders/basic.fs.glsl");
     initShaderProgram(color, "./shaders/color.vs.glsl", "./shaders/color.fs.glsl");
+
+    //SceneDrawElements' buffers that will be reused
+    coloredSquareReduceBuffer.allocate(GL_ARRAY_BUFFER,
+        sizeof(colorSquareVerticesReduced),
+        colorSquareVerticesReduced,
+        GL_STATIC_DRAW);
+
+    coloredSquareReduceIndicesBuffer.allocate(GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(indexes),
+        indexes,
+        GL_STATIC_DRAW);
 }
 
 void Resources::initShaderProgram(ShaderProgram& program, const char* vertexSrcPath, const char* fragmentSrcPath)    

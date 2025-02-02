@@ -10,6 +10,7 @@ LDFLAGS += -L./ -L$(BUILD) -Wl,-rpath=./ -lcorrector
 LDFLAGS += $(shell pkg-config --libs glew || echo -I/usr/local/lib -lGLEW)
 LDFLAGS += $(shell pkg-config --libs $(CONTEXT) || echo -I/usr/local/lib -lSDL2)
 
+
 SRC=main
 BUILD=./build-$(shell uname)
 EXE=$(BUILD)/tp1.exe
