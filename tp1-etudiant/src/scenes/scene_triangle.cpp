@@ -5,7 +5,7 @@
 #include "utils.h"
 
 SceneTriangle::SceneTriangle(Resources& res)
-: Scene(res), m_triangleBuffer(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW), m_triangleDraw(m_triangleVao, 3) //m_triangleBuffer(GL_ARRAY_BUFFER),
+: Scene(res), m_triangleBuffer(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW), m_triangleDraw(m_triangleVao, 3) 
 {
     // TODO
     m_triangleBuffer.allocate(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW); //on a change allocate a public

@@ -1,6 +1,6 @@
 #include "scene_multiple_vbos.h"
-
 #include "vertices_data.h"
+#include <iostream>
 
 SceneMultipleVbos::SceneMultipleVbos(Resources& res)
 : Scene(res)
@@ -9,8 +9,29 @@ SceneMultipleVbos::SceneMultipleVbos(Resources& res)
 , m_onlyColorTriVertices{ 1.0f, 0.0f, 0.0f,
                            1.0f, 0.0f, 0.0f,
                            1.0f, 0.0f, 0.0f }
+, m_coloredTrianglePositionBuffer(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW) //empty buffer that will have moving positions
+, m_coloredTriangleColorBuffer(GL_ARRAY_BUFFER, sizeof(m_onlyColorTriVertices), m_onlyColorTriVertices, GL_DYNAMIC_DRAW)
+, m_coloredTriangleMultipleVbosDraw(m_coloredTriangleMultipleVbosVao, 3)
 {
-    // TODO
+    // TODO binding vao, done later inside specifyAttribute() but safer
+    m_coloredTriangleMultipleVbosVao.bind();
+
+    //moving triangle's vertext coordinates, no transformation so const
+    const GLfloat movingTriPositions[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f
+    };
+
+    //buffers allocation and attribute specification
+    m_coloredTrianglePositionBuffer.allocate(GL_ARRAY_BUFFER, sizeof(movingTriPositions), movingTriPositions, GL_DYNAMIC_DRAW);
+    m_coloredTriangleMultipleVbosVao.specifyAttribute(m_coloredTrianglePositionBuffer, 0, 3, 3, 0);
+
+    m_coloredTriangleColorBuffer.allocate(GL_ARRAY_BUFFER, sizeof(m_onlyColorTriVertices), m_onlyColorTriVertices, GL_DYNAMIC_DRAW);
+    m_coloredTriangleMultipleVbosVao.specifyAttribute(m_coloredTriangleColorBuffer, 1, 3, 3, 0);
+
+    //vao unbind
+    m_coloredTriangleMultipleVbosVao.unbind();
 }
 
 void SceneMultipleVbos::run(Window& w)
@@ -19,13 +40,27 @@ void SceneMultipleVbos::run(Window& w)
     changeRGB(&m_onlyColorTriVertices[3]);
     changeRGB(&m_onlyColorTriVertices[6]);
     // TODO mise a jour de la couleur
+    m_coloredTriangleColorBuffer.update(sizeof(m_onlyColorTriVertices), m_onlyColorTriVertices);
 
     // TODO mise a jour de la position
-	    // Faire attention au nombre de composantes (modifier la méthode au besoin)
-        GLfloat* posPtr = nullptr;
-    changePos(posPtr, m_positionX, m_positionY, m_deltaX, m_deltaY);
+    // Faire attention au nombre de composantes (modifier la méthode au besoin)
+    GLfloat* posPtr = static_cast<GLfloat*>(m_coloredTrianglePositionBuffer.mapBuffer());
+    if(posPtr){
+        changePos(posPtr, m_positionX, m_positionY, m_deltaX, m_deltaY);
+        m_coloredTrianglePositionBuffer.unmapBuffer();  //complete update with unmap
+    }else{
+        std::cerr << "Error while mapping position buffer" << std::endl;
+    }
+
 
     // TODO dessin
+    //use color shader program
+    m_resources.color.use();
+
+    //bind vao in run, draw then unbind after
+    m_coloredTriangleMultipleVbosVao.bind(); //might be overkill but safer 
+    m_coloredTriangleMultipleVbosDraw.draw();
+    m_coloredTriangleMultipleVbosVao.unbind();
 }
 
 

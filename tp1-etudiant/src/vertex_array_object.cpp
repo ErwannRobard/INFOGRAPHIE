@@ -34,10 +34,6 @@ void VertexArrayObject::specifyAttribute(BufferObject& buffer, GLuint index, GLi
     // TODO
     bind(); //bind vao
     buffer.bind(); //bind VBO
-
-    //corrector sizeof?
-    // GLsizei sizeStride = stride * sizeof(float);
-    // const void* sizeOffset = (const void*)(offset * sizeof(float));
     
     //enable then set up vertex attribute
     glEnableVertexAttribArray(index);

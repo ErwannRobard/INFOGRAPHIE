@@ -3,7 +3,7 @@
 #include "vertices_data.h"
 
 SceneSquare::SceneSquare(Resources& res)
-: Scene(res), m_squareBuffer(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW), m_squareDraw(m_squareVao, 6) // square buffer migh have wrong params, check
+: Scene(res), m_squareBuffer(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW), m_squareDraw(m_squareVao, 6)
 {
     // TODO
     m_squareBuffer.allocate(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);

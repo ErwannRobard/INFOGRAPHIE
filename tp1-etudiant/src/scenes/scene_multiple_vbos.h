@@ -26,7 +26,8 @@ private:
     BufferObject m_coloredTrianglePositionBuffer;
     BufferObject m_coloredTriangleColorBuffer;
     VertexArrayObject m_coloredTriangleMultipleVbosVao;
-    // DrawArraysCommand m_coloredTriangleMultipleVbosDraw;
+    //remember to use this one
+    DrawArraysCommand m_coloredTriangleMultipleVbosDraw;
 };
 
 #endif // SCENE_MULTIPLE_VBOS_H
