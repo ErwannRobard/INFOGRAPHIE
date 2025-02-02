@@ -55,9 +55,9 @@ void SceneMultipleVbos::run(Window& w)
     //use color shader program
     m_resources.color.use();
 
-    //bind vao in run, draw then unbind after
-    m_coloredTriangleMultipleVbosDraw.draw();
+    //bind vao in run,  unbind then draw 
     m_coloredTriangleMultipleVbosVao.unbind();
+    m_coloredTriangleMultipleVbosDraw.draw();
 }
 
 
