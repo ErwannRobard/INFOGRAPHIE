@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     printGLInfo();
     
     //CORRECTOR
-    //corrector(w);
+    corrector(w);
     
     Resources res;
     

@@ -11,6 +11,7 @@ Resources::Resources()
     // TODO
     initShaderProgram(basic, "./shaders/basic.vs.glsl", "./shaders/basic.fs.glsl");
     initShaderProgram(color, "./shaders/color.vs.glsl", "./shaders/color.fs.glsl");
+    initShaderProgram(transformColorAttrib, "./shaders/transform.vs.glsl", "./shaders/transform.fs.glsl");
 
     //SceneDrawElements' buffers that will be reused
     coloredSquareReduceBuffer.allocate(GL_ARRAY_BUFFER,

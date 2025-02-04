@@ -20,7 +20,7 @@ private:
     BufferObject m_cubeBuffer;
     BufferObject m_cubeIndicesBuffer;
     VertexArrayObject m_cubeVao;
-    //DrawElementsCommand m_cubeDraw;
+    DrawElementsCommand m_cubeDraw;
 };
 
 #endif // SCENE_CUBE_H

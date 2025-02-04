@@ -15,9 +15,7 @@ public:
     void attachShaderObject(ShaderObject& s);
     void link();
 
-    ////////
     GLuint getId();
-    /////////
     
     GLint getUniformLoc(const char* name);
     
