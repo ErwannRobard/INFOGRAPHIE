@@ -18,12 +18,16 @@ void SceneSharedVao::run(Window& w)
 void SceneSharedVao::runTriangle()
 {
     // TODO
+    //USE COLOR SHADER EXPLICITELY OR CUBE SCENE TRANSFORMATIONS ROTATES VAOs
+    m_resources.color.use();
     //bind buffer only before drawing
     m_sharedVao.bind();
     //coloredTriangle attributes
     m_sharedVao.specifyAttribute(m_resources.coloredTriangleBuffer, 0, 2, 5, 0);
     m_sharedVao.specifyAttribute(m_resources.coloredTriangleBuffer, 1, 3, 5, 2);
 
+    //unbind EBO from active shared VAO, avoid unwanted previous configurations from scene swtich
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     m_sharedVao.unbind();
     m_coloredTriangleSharedDraw.draw();
 }
@@ -31,14 +35,16 @@ void SceneSharedVao::runTriangle()
 void SceneSharedVao::runSquare()
 {
     // TODO
+    //USE COLOR SHADER EXPLICITELY OR CUBE SCENE TRANSFORMATIONS ROTATES VAOs
+    m_resources.color.use();
     m_sharedVao.bind();
 
     m_sharedVao.specifyAttribute(m_resources.coloredSquareReduceBuffer, 0, 2, 5, 0);
     m_sharedVao.specifyAttribute(m_resources.coloredSquareReduceBuffer, 1, 3, 5, 2);
     //EBO for square
     m_resources.coloredSquareReduceIndicesBuffer.bind();
-
     m_sharedVao.unbind();
+
     m_coloredSquareSharedDraw.draw();
 
 }

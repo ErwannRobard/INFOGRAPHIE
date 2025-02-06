@@ -7,7 +7,7 @@
 #include "vertices_data.h"
 
 SceneCube::SceneCube(Resources& res)
-: Scene(res), m_cubeDraw(m_cubeVao, 36)
+: Scene(res), m_rotationAngleDegree(0.0f), m_cubeDraw(m_cubeVao, 36, GL_UNSIGNED_BYTE)
 {
     // TODO
     m_cubeVao.bind();
@@ -16,9 +16,11 @@ SceneCube::SceneCube(Resources& res)
 
     m_cubeIndicesBuffer.allocate(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndexes), cubeIndexes, GL_STATIC_DRAW);
 
-    m_cubeVao.specifyAttribute(m_cubeBuffer, 0, 3, 6 * sizeof(float), 0);
+    m_cubeVao.specifyAttribute(m_cubeBuffer, 0, 3, 6, 0);
 
-    m_cubeVao.specifyAttribute(m_cubeBuffer, 1, 3, 6 * sizeof(float), 3 * sizeof(float));
+    m_cubeVao.specifyAttribute(m_cubeBuffer, 1, 3, 6, 3);
+
+    m_cubeVao.unbind();
 }
 
 void SceneCube::run(Window& w)
