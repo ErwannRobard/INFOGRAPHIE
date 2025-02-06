@@ -91,6 +91,7 @@ void SceneAttraction::run(Window& w, double dt)
         view = getCameraThirdPerson();
     
     // TODO - dessin de la scène
+    //glUniform
     
     // Debut de code pour le dessin des groupes de tasses (et obtenir la position du singe)
     glm::vec3 monkeyPos = glm::vec3(0.0f);
