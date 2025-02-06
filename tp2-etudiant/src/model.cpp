@@ -2,10 +2,14 @@
 #include "obj_loader.h"
 
 Model::Model(const char* path)
+	: m_vbo(), m_ebo(), m_vao(), m_drawcall(m_vao, 0, GL_UNSIGNED_BYTE)
 // TODO
 {
 	// TODO
 	// Cette fois-ci, la méthode BufferObject::allocate est publique (et devrait être utilisé ici)
+	std::vector<GLfloat> vertexData;
+	std::vector<GLuint> indices;
+	loadObj(path, vertexData, indices);
 }
 
 void Model::loadObj(const char* path, std::vector<GLfloat>& vertexData, std::vector<GLuint>& indices)
@@ -34,5 +38,6 @@ void Model::loadObj(const char* path, std::vector<GLfloat>& vertexData, std::vec
 void Model::draw()
 {
 	// TODO
+	m_drawcall.draw();
 }
 
