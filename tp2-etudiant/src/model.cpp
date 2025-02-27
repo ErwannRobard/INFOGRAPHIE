@@ -2,7 +2,7 @@
 #include "obj_loader.h"
 
 Model::Model(const char* path)
-	: m_vbo(), m_ebo(), m_vao(), m_drawcall(m_vao, 0, GL_UNSIGNED_BYTE)
+	: m_vbo(), m_ebo(), m_vao(), m_drawcall(m_vao, 0, GL_UNSIGNED_INT)
 // TODO
 {
 	// TODO

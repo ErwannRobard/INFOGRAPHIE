@@ -10,9 +10,9 @@
 // TODO - coordonnées de texture
 const GLfloat groundData[] = {
     -45.f, 0.0f, -45.f,  0.0f, 0.0f,
-     45.f, 0.0f, -45.f,  0.0f, 0.0f,
-    -45.f, 0.0f,  45.f,  0.0f, 0.0f,
-     45.f, 0.0f,  45.f,  0.0f, 0.0f,
+     45.f, 0.0f, -45.f,  6.0f, 0.0f,
+    -45.f, 0.0f,  45.f,  0.0f, 6.0f,
+     45.f, 0.0f,  45.f,  6.0f, 6.0f,
 };
 
 const GLubyte indexes[] = {
@@ -170,6 +170,7 @@ void SceneAttraction::run(Window& w, double dt)
     for (int i = 0; i < 3; i++)
     {
         float angle = i * glm::radians(120.0f);
+        
         glm::mat4 groupModel(1.0f);
         groupModel = glm::rotate(groupModel, angle, glm::vec3(0,1,0));
         groupModel = glm::translate(groupModel, glm::vec3(15.0f, 0.5f, 0.0f));
@@ -184,6 +185,7 @@ void SceneAttraction::run(Window& w, double dt)
         for (int j = 0; j < 4; j++)
         {
             float cupangle = j * glm::radians(90.0f);
+
             glm::mat4 cupBase = groupModel;
             cupBase = glm::rotate(cupBase, cupangle, glm::vec3(0,1,0));
             cupBase = glm::translate(cupBase, glm::vec3(6.0f, 0.0f, 0.0f));
