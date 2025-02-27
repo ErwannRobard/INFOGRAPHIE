@@ -57,7 +57,6 @@ SceneAttraction::SceneAttraction(Resources& res, bool& isMouseMotionEnabled)
     m_groundIndicesBuffer.bind();
     m_groundBuffer.bind();
 
-    // m_groundVao.specifyAttribute(m_groundBuffer, m_groundIndicesBuffer);
     m_groundVao.specifyAttribute(m_groundBuffer, 0, 3, 5, 0);
 
     m_groundVao.specifyAttribute(m_groundBuffer, 1, 2, 5, 3);
@@ -65,6 +64,26 @@ SceneAttraction::SceneAttraction(Resources& res, bool& isMouseMotionEnabled)
     m_groundVao.unbind();
 
     // TODO - init des textures
+
+    m_groundTexture.setWrap(GL_REPEAT);
+    m_groundTexture.setFiltering(GL_LINEAR);
+    m_groundTexture.enableMipmap();
+
+    m_suzanneTexture.setWrap(GL_CLAMP_TO_EDGE);
+    m_suzanneTexture.setFiltering(GL_LINEAR);
+    m_suzanneTexture.enableMipmap();
+
+    m_cupTextureAtlas.setWrap(GL_CLAMP_TO_EDGE);
+    m_cupTextureAtlas.setFiltering(GL_LINEAR);
+    m_cupTextureAtlas.enableMipmap();
+
+    m_smallPlatformTexture.setWrap(GL_CLAMP_TO_EDGE);
+    m_smallPlatformTexture.setFiltering(GL_LINEAR);
+    m_smallPlatformTexture.enableMipmap();
+
+    m_largePlatformTexture.setWrap(GL_CLAMP_TO_EDGE);
+    m_largePlatformTexture.setFiltering(GL_NEAREST);
+    m_largePlatformTexture.enableMipmap();
 }
 
 SceneAttraction::~SceneAttraction()
@@ -98,41 +117,112 @@ void SceneAttraction::run(Window& w, double dt)
         view = getCameraThirdPerson();
     
     // TODO - dessin de la scène
-    //glUniform
-    glUseProgram(1);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f)); // juste un petit decalage en bas
+    mvp = proj * view * model;
+
+    m_resources.texture.use();
+    m_groundTexture.use();
+    glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &mvp[0][0]);
     m_groundDraw.draw();
 
-    // glm::mat4 groundModel = glm::mat4(1.0f);
-    // m_groundTexture.bind();
-    // mvp = proj * view * groundModel;
-    // setUniformMatrix("u_MVP", mvp);
-    // m_groundDraw.draw();
+    // Dessiner les cubes
+    glm::vec3 cubePositions[4] = {
+        glm::vec3( 30.f, 3.f,  0.f),
+        glm::vec3(-30.f, 3.f,  0.f),
+        glm::vec3(  0.f, 3.f, 30.f),
+        glm::vec3(  0.f, 3.f,-30.f)
+    };
 
-    // Debut de code pour le dessin des groupes de tasses (et obtenir la position du singe)
-    glm::vec3 monkeyPos = glm::vec3(0.0f);
-    float monkeyHeading = 0.0f;
+    glm::vec3 cubeColors[4] = {
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f)
+    };
+
+    m_resources.colorUniform.use();
+    for (int i = 0; i < 4; i++)
+    {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+        model = glm::scale(model, glm::vec3(6.0f));
+        mvp = proj * view * model;
+
+        glUniformMatrix4fv(m_resources.mvpLocationColorUniform, 1, GL_FALSE, &mvp[0][0]);
+        glUniform3fv(m_resources.colorLocationColorUniform, 1, &cubeColors[i][0]);
+        m_cube.draw();
+    }
+
+    // Dessiner la grande plateforme
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, m_largePlatformAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+    mvp = proj * view * model;
+
+    m_resources.texture.use();
+    glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &mvp[0][0]);
+    m_largePlatformTexture.use();
+    m_largePlatform.draw();
+
+    
+    // Dessiner les petites plateformes et les tasses
     for (int i = 0; i < 3; i++)
     {
-        
+        float angle = i * glm::radians(120.0f);
+        glm::mat4 groupModel(1.0f);
+        groupModel = glm::rotate(groupModel, angle, glm::vec3(0,1,0));
+        groupModel = glm::translate(groupModel, glm::vec3(15.0f, 0.5f, 0.0f));
+        groupModel = glm::rotate(groupModel, m_smallPlatformAngle[i], glm::vec3(0,1,0));
+
+        mvp = proj * view * groupModel;
+        m_resources.texture.use();
+        glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &mvp[0][0]);
+        m_smallPlatformTexture.use();
+        m_smallPlatform.draw();
+
         for (int j = 0; j < 4; j++)
         {
-            // Mettez la matrice model finale de la tasse dans cette matrice
-            // pour être en mesure d'avoir la position et orientation du singe
-            glm::mat4 cupModelMat = glm::mat4(1.0f);
+            float cupangle = j * glm::radians(90.0f);
+            glm::mat4 cupBase = groupModel;
+            cupBase = glm::rotate(cupBase, cupangle, glm::vec3(0,1,0));
+            cupBase = glm::translate(cupBase, glm::vec3(6.0f, 0.0f, 0.0f));
+            cupBase = glm::rotate(cupBase, m_cupsAngles[i][j], glm::vec3(0,1,0));
+
+            glm::mat4 plateModel = cupBase;
+            mvp = proj * view * plateModel;
+            m_resources.cup.use();
+            glUniformMatrix4fv(m_resources.mvpLocationCup, 1, GL_FALSE, &mvp[0][0]);
+            m_cupTextureAtlas.use();
+            m_cupPlate.draw();
+
+            glm::mat4 finalCupModel = cupBase;
+            finalCupModel = glm::translate(finalCupModel, glm::vec3(0.0f, 0.12f, 0.0f));
+            mvp = proj * view * finalCupModel;
+            glUniformMatrix4fv(m_resources.mvpLocationCup, 1, GL_FALSE, &mvp[0][0]);
+            glUniform1i(m_resources.textureIndexLocationCup, j);
+            glUniform1i(m_resources.isPlateLocationCup, 0);
+            m_cupTextureAtlas.use();
+            m_cup.draw();
+
             if (i == 0 && j == 0)
             {
-                monkeyPos = glm::vec3(cupModelMat[3].x, 1.3, cupModelMat[3].z);
-                monkeyHeading = atan2(cupModelMat[2].x, cupModelMat[0].x);
+                glm::mat4 monkeyModel = finalCupModel;
+                monkeyModel = glm::scale(monkeyModel, glm::vec3(2.0f));
+                mvp = proj * view * monkeyModel;
+                m_resources.texture.use();
+                glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &mvp[0][0]);
+                m_suzanneTexture.use();
+                m_suzanne.draw();
+
+                if (m_cameraMode == 2)
+                {
+                    m_cameraPosition = glm::vec3(monkeyModel[3]);
+                    m_cameraPosition.y = 3.8f;
+                    m_cameraOrientation.y = std::atan2(monkeyModel[2].x, monkeyModel[0].x);
+                }
             }
         }
-    }
-    
-    // Laissez ce code à la fin de la méthode
-    if (m_cameraMode == 2)
-    {
-        m_cameraPosition = monkeyPos;
-        m_cameraPosition.y = 3.8;
-        m_cameraOrientation.y = monkeyHeading;
     }
 }
 
@@ -182,29 +272,30 @@ void SceneAttraction::updateInput(Window& w, double dt)
 
 glm::mat4 SceneAttraction::getCameraFirstPerson()
 {
-    glm::mat4 view = glm::mat4(1.0f);
-    
-    view = glm::rotate(view, -m_cameraOrientation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    view = glm::rotate(view, -m_cameraOrientation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    
-    view = glm::translate(view, -m_cameraPosition);
+    glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), -m_cameraOrientation.x, glm::vec3(1.0f, 0.0f, 0.0f)); 
+    glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), -m_cameraOrientation.y, glm::vec3(0.0f, 1.0f, 0.0f)); 
+    glm::mat4 rotation = rotationY * rotationX;
+
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), -m_cameraPosition); 
+    glm::mat4 view = rotation * translation;
     
     return view;
 }
 
 glm::mat4 SceneAttraction::getCameraThirdPerson()
 {
-    const float radius = 36.0f;
-    
-    float camX = radius * cos(m_cameraOrientation.x) * sin(m_cameraOrientation.y);
-    float camY = radius * sin(m_cameraOrientation.x);
-    float camZ = radius * cos(m_cameraOrientation.x) * cos(m_cameraOrientation.y);
-    
-    glm::vec3 cameraPos = glm::vec3(camX, camY, camZ);
-    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    
-    return glm::lookAt(cameraPos, target, up);
+    float radius = 36.0f; 
+    float theta = m_cameraOrientation.x;
+    float phi = m_cameraOrientation.y + glm::half_pi<float>();
+
+    glm::vec3 cameraPos = m_cameraPosition + glm::vec3(
+        radius * glm::cos(theta) * glm::sin(phi),
+        radius * glm::sin(phi),                
+        radius * glm::cos(theta) * glm::sin(phi)
+    );
+
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
+    return glm::lookAt(cameraPos, m_cameraPosition, up);
 }
 
 
@@ -212,20 +303,18 @@ glm::mat4 SceneAttraction::getProjectionMatrix(Window& w)
 {
     // TODO
     const float SCREEN_SIZE_ORTHO = 10.0f;
-    const float NEAR_PLANE = 0.1f;
-    const float FAR_PLANE = 300.0f;
-    const float FOV = glm::radians(70.0f);
-
+    float aspectRatio = static_cast<float>(w.getWidth()) / static_cast<float>(w.getHeight());
     glm::mat4 proj;
 
-    if (m_isOrtho){
-        proj = glm::ortho(-SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f, 
-                          -SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f, 
-                          NEAR_PLANE, FAR_PLANE);    
-    } else {
-        float aspectRatio = static_cast<float>(w.getWidth()) / static_cast<float>(w.getHeight());
-        proj = glm::perspective(FOV, aspectRatio, NEAR_PLANE, FAR_PLANE);
-    }
+    if (m_isOrtho)
+        proj = glm::ortho(
+            -SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f,
+            -SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f,  
+            0.1f, 300.0f                                          
+        );
+    else
+        proj = glm::perspective(glm::radians(70.0f), aspectRatio, 0.1f, 300.0f);
+
     return proj;
 }
 

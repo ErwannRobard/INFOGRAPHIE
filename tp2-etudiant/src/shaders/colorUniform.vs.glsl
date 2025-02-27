@@ -2,10 +2,10 @@
 
 // TODO
 
-layout(location = 0) in vec4 aPosition;
+uniform mat4 mat;
+layout(location = 0) in vec3 aPos;
 
-uniform mat4 mvp;
 
 void main() {
-    gl_Position = mvp * aPosition;
+    gl_Position = mat * vec4(aPos, 1.0);
 }

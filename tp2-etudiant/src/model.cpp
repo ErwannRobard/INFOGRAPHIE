@@ -10,6 +10,16 @@ Model::Model(const char* path)
 	std::vector<GLfloat> vertexData;
 	std::vector<GLuint> indices;
 	loadObj(path, vertexData, indices);
+	
+	m_vbo.allocate(GL_ARRAY_BUFFER, sizeof(GLfloat)*vertexData.size(), vertexData.data(), GL_STATIC_DRAW);
+	m_ebo.allocate(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indices.size(), indices.data(), GL_STATIC_DRAW);
+	m_vao.bind();
+	m_ebo.bind(); 
+	m_vao.specifyAttribute(m_vbo, 0, 3, 5, 0);
+	m_vao.specifyAttribute(m_vbo, 1, 2, 5, 3);
+	m_vao.unbind();
+
+	m_drawcall.setCount(indices.size());
 }
 
 void Model::loadObj(const char* path, std::vector<GLfloat>& vertexData, std::vector<GLuint>& indices)
