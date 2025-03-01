@@ -119,7 +119,7 @@ void SceneAttraction::run(Window& w, double dt)
     // TODO - dessin de la scène
 
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f)); // juste un petit decalage en bas
+    model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.0f));
     mvp = proj * view * model;
 
     m_resources.texture.use();
@@ -127,7 +127,6 @@ void SceneAttraction::run(Window& w, double dt)
     glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &mvp[0][0]);
     m_groundDraw.draw();
 
-    // Dessiner les cubes
     glm::vec3 cubePositions[4] = {
         glm::vec3( 30.f, 3.f,  0.f),
         glm::vec3(-30.f, 3.f,  0.f),
@@ -155,7 +154,6 @@ void SceneAttraction::run(Window& w, double dt)
         m_cube.draw();
     }
 
-    // Dessiner la grande plateforme
     model = glm::mat4(1.0f);
     model = glm::rotate(model, m_largePlatformAngle, glm::vec3(0.0f, 1.0f, 0.0f));
     mvp = proj * view * model;
@@ -166,7 +164,6 @@ void SceneAttraction::run(Window& w, double dt)
     m_largePlatform.draw();
 
     
-    // Dessiner les petites plateformes et les tasses
     for (int i = 0; i < 3; i++)
     {
         float angle = i * glm::radians(120.0f);
@@ -313,17 +310,23 @@ glm::mat4 SceneAttraction::getProjectionMatrix(Window& w)
 {
     // TODO
     const float SCREEN_SIZE_ORTHO = 10.0f;
-    float aspectRatio = static_cast<float>(w.getWidth()) / static_cast<float>(w.getHeight());
+    const float NEAR_PLANE = 0.1f;
+    const float FAR_PLANE = 300.0f;
+    const float FOV = glm::radians(70.0f);
+
     glm::mat4 proj;
 
     if (m_isOrtho)
-        proj = glm::ortho(
-            -SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f,
-            -SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f,  
-            0.1f, 300.0f                                          
-        );
+    {
+        proj = glm::ortho(-SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f, 
+                          -SCREEN_SIZE_ORTHO / 2.0f, SCREEN_SIZE_ORTHO / 2.0f, 
+                          NEAR_PLANE, FAR_PLANE);
+    }
     else
-        proj = glm::perspective(glm::radians(70.0f), aspectRatio, 0.1f, 300.0f);
+    {
+        float aspectRatio = static_cast<float>(w.getWidth()) / static_cast<float>(w.getHeight());
+        proj = glm::perspective(FOV, aspectRatio, NEAR_PLANE, FAR_PLANE);
+    }
 
     return proj;
 }
