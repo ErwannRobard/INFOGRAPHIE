@@ -170,11 +170,13 @@ void SceneAttraction::run(Window& w, double dt)
     for (int i = 0; i < 3; i++)
     {
         float angle = i * glm::radians(120.0f);
-        
-        glm::mat4 groupModel(1.0f);
-        groupModel = glm::rotate(groupModel, angle, glm::vec3(0,1,0));
-        groupModel = glm::translate(groupModel, glm::vec3(15.0f, 0.5f, 0.0f));
-        groupModel = glm::rotate(groupModel, m_smallPlatformAngle[i], glm::vec3(0,1,0));
+
+        glm::mat4 groupModel = glm::mat4(1.0f);
+
+        groupModel = glm::rotate(groupModel, m_largePlatformAngle, glm::vec3(0,1,0));  
+        groupModel = glm::rotate(groupModel, angle, glm::vec3(0,1,0));  
+        groupModel = glm::translate(groupModel, glm::vec3(15.0f, 0.0f, 0.0f));  
+        groupModel = glm::rotate(groupModel, m_smallPlatformAngle[i], glm::vec3(0,1,0)); 
 
         mvp = proj * view * groupModel;
         m_resources.texture.use();
@@ -184,12 +186,13 @@ void SceneAttraction::run(Window& w, double dt)
 
         for (int j = 0; j < 4; j++)
         {
-            float cupangle = j * glm::radians(90.0f);
+            float cupAngle = j * glm::radians(90.0f);  
 
             glm::mat4 cupBase = groupModel;
-            cupBase = glm::rotate(cupBase, cupangle, glm::vec3(0,1,0));
-            cupBase = glm::translate(cupBase, glm::vec3(6.0f, 0.0f, 0.0f));
-            cupBase = glm::rotate(cupBase, m_cupsAngles[i][j], glm::vec3(0,1,0));
+           
+            cupBase = glm::rotate(cupBase, cupAngle, glm::vec3(0,1,0));  
+            cupBase = glm::translate(cupBase, glm::vec3(6.0f, 0.0f, 0.0f));  
+            cupBase = glm::rotate(cupBase, m_cupsAngles[i][j], glm::vec3(0,1,0));  
 
             glm::mat4 plateModel = cupBase;
             mvp = proj * view * plateModel;
@@ -199,7 +202,7 @@ void SceneAttraction::run(Window& w, double dt)
             m_cupPlate.draw();
 
             glm::mat4 finalCupModel = cupBase;
-            finalCupModel = glm::translate(finalCupModel, glm::vec3(0.0f, 0.12f, 0.0f));
+            finalCupModel = glm::translate(finalCupModel, glm::vec3(0.0f, 0.12f, 0.0f)); // Slight vertical offset
             mvp = proj * view * finalCupModel;
             glUniformMatrix4fv(m_resources.mvpLocationCup, 1, GL_FALSE, &mvp[0][0]);
             glUniform1i(m_resources.textureIndexLocationCup, j);
@@ -209,19 +212,24 @@ void SceneAttraction::run(Window& w, double dt)
 
             if (i == 0 && j == 0)
             {
+                if(m_cameraMode != 2){
+
                 glm::mat4 monkeyModel = finalCupModel;
                 monkeyModel = glm::scale(monkeyModel, glm::vec3(2.0f));
+                monkeyModel = glm::translate(monkeyModel, glm::vec3(0.0f, 0.5f, 0.0f));
                 mvp = proj * view * monkeyModel;
                 m_resources.texture.use();
                 glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &mvp[0][0]);
                 m_suzanneTexture.use();
                 m_suzanne.draw();
-
-                if (m_cameraMode == 2)
+                } 
+                else    //no draw on monke cameraMode
                 {
-                    m_cameraPosition = glm::vec3(monkeyModel[3]);
+                    glm::mat4 suzanneMyLove = finalCupModel;
+                    suzanneMyLove = glm::scale(suzanneMyLove, glm::vec3(2.0f));
+                    m_cameraPosition = glm::vec3(suzanneMyLove[3]);
                     m_cameraPosition.y = 3.8f;
-                    m_cameraOrientation.y = std::atan2(monkeyModel[2].x, monkeyModel[0].x);
+                    m_cameraOrientation.y = std::atan2(suzanneMyLove[2].x, suzanneMyLove[0].x);
                 }
             }
         }
