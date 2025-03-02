@@ -10,6 +10,10 @@ Model::Model(const char* path)
 	std::vector<GLfloat> vertexData;
 	std::vector<GLuint> indices;
 	loadObj(path, vertexData, indices);
+
+	if (vertexData.empty() || indices.empty()) {
+        throw std::runtime_error("Failed to load model data from " + std::string(path));
+    }
 	
 	m_vbo.allocate(GL_ARRAY_BUFFER, sizeof(GLfloat)*vertexData.size(), vertexData.data(), GL_STATIC_DRAW);
 	m_ebo.allocate(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indices.size(), indices.data(), GL_STATIC_DRAW);

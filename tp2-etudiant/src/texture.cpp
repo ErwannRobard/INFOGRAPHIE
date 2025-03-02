@@ -22,12 +22,14 @@ Texture2D::Texture2D(const char* path)
     glBindTexture(GL_TEXTURE_2D, m_id);
 
     GLenum format;
-    if (nChannels == 1)
-        format = GL_RED;
-    else if (nChannels == 3)
-        format = GL_RGB;
-    else if (nChannels == 4)
-        format = GL_RGBA;
+    switch (nChannels) {
+        case 1: format = GL_RED; break;
+        case 3: format = GL_RGB; break;
+        case 4: format = GL_RGBA; break;
+        default: 
+            stbi_image_free(data);
+            throw std::runtime_error("Unsupported number of channels in texture: " + std::to_string(nChannels));
+    }
 
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
