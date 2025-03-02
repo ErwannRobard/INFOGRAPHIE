@@ -279,30 +279,39 @@ void SceneAttraction::updateInput(Window& w, double dt)
 
 glm::mat4 SceneAttraction::getCameraFirstPerson()
 {
-    glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), -m_cameraOrientation.x, glm::vec3(1.0f, 0.0f, 0.0f)); 
-    glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), -m_cameraOrientation.y, glm::vec3(0.0f, 1.0f, 0.0f)); 
-    glm::mat4 rotation = rotationY * rotationX;
+    //TODONE
+    //rotation: yaw - localX - pitch around localX
+    glm::mat4 rotation = glm::mat4(1.0f);
+    rotation = glm::rotate(rotation, -m_cameraOrientation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::vec3 locaXAxis = glm::normalize(glm::vec3(rotation[0].x, rotation[1].x, rotation[2].x));
+    rotation = glm::rotate(rotation, -m_cameraOrientation.x, locaXAxis);
 
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), -m_cameraPosition); 
+    //then translation, keep both isolated
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), -m_cameraPosition);
     glm::mat4 view = rotation * translation;
-    
+
     return view;
 }
 
 glm::mat4 SceneAttraction::getCameraThirdPerson()
 {
+    //TODO
+    
     float radius = 36.0f; 
-    float theta = m_cameraOrientation.x;
-    float phi = m_cameraOrientation.y + glm::half_pi<float>();
+    float theta = glm::radians(m_cameraOrientation.y * 30.0f); //yaw with hardcoded speed since we can't change updateInput
+    float phi = glm::radians(m_cameraOrientation.x * 30.0f); //pitch
 
-    glm::vec3 cameraPos = m_cameraPosition + glm::vec3(
-        radius * glm::cos(theta) * glm::sin(phi),
-        radius * glm::sin(phi),                
-        radius * glm::cos(theta) * glm::sin(phi)
+    phi = glm::clamp(phi, glm::radians(-89.0f), glm::radians(89.0f)); //clamp to avoid flipping
+    glm::vec3 targetPosition = glm::vec3(0.0f, 3.0f, 0.0f); //fixed camera
+
+    glm::vec3 cameraPos = targetPosition + glm::vec3(
+        radius * glm::cos(phi) * glm::cos(theta),   //X
+        radius * glm::sin(phi),                     //Y
+        radius * glm::cos(phi) * glm::sin(theta)    //Z
     );
 
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
-    return glm::lookAt(cameraPos, m_cameraPosition, up);
+    glm::vec3 up = glm::normalize(glm::vec3(0.0f, 1.0, 0.0f)); 
+    return glm::lookAt(cameraPos, targetPosition, up);
 }
 
 
