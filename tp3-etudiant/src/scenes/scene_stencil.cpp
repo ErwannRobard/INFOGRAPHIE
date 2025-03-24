@@ -66,6 +66,9 @@ void SceneStencil::run(Window& w, double dt)
 {
     updateInput(w, dt);
 
+    ShaderProgram& shader = m_resources.texture;
+    shader.use();
+
     glm::mat4 model, proj, view, mvp;
     
     proj = getProjectionMatrix(w);    
@@ -74,6 +77,47 @@ void SceneStencil::run(Window& w, double dt)
     
     // TODO Dessin de la scène de stencil
     // utiliser les shaders texture et simpleColor ici
+    // --- GROUND ---
+    {
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.1f, 0));
+        glm::mat4 mvp = projView * model;
+        
+        glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, glm::value_ptr(mvp));
+        
+        m_groundTexture.use(0);
+        glUniform1i(shader.getUniformLoc("colorTexture"), 0);
+        
+        m_groundVao.bind();
+        m_groundDraw.draw();
+        m_groundVao.unbind();
+    }
+
+    // --- ROCK ---
+    {
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(-10, 0.4f, 0));
+        model = glm::scale(model, glm::vec3(2.0f));
+        glm::mat4 mvp = projView * model;
+        
+        glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, glm::value_ptr(mvp));
+        
+        m_rockTexture.use(0);
+        glUniform1i(shader.getUniformLoc("colorTexture"), 0);
+        
+        m_rock.draw();
+    }
+
+    // --- MONKEY ---
+    {
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(-14, -0.1f, 2));
+        glm::mat4 mvp = projView * model;
+        
+        glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, glm::value_ptr(mvp));
+        
+        m_suzanneTexture.use(0);
+        glUniform1i(shader.getUniformLoc("colorTexture"), 0);
+        
+        m_suzanne.draw();
+    }
 }
 
 void SceneStencil::updateInput(Window& w, double dt)
