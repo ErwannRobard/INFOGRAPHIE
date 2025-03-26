@@ -8,6 +8,8 @@
 
 #include "utils.h"
 
+#include <array>
+
 #include <iostream>
 
 
@@ -151,6 +153,53 @@ void SceneStencil::run(Window& w, double dt)
     m_groundVao.bind();
     m_groundDraw.draw();
     m_groundVao.unbind();
+
+    // monkeys
+    {
+        const std::array<glm::vec3, 3> monkeysPos = {
+            glm::vec3{12.0f, -0.1f,  4.0f},
+            glm::vec3{12.0f, -0.1f,  0.0f},
+            glm::vec3{12.0f, -0.1f, -4.0f}
+        };
+
+        m_resources.texture.use();
+        m_suzanneWhiteTexture.use();
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+
+        for (const auto& position : monkeysPos) {
+            glm::mat4 statueModel = glm::translate(glm::mat4(1.0f), position);
+            statueModel = glm::rotate(statueModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        
+            glm::mat4 groundMVP = projView * statueModel;
+            glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &groundMVP[0][0]);
+
+            m_suzanne.draw();
+        }
+    }
+
+    // glass
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_CULL_FACE);
+
+    {
+        glm::mat4 glassModel = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -0.1f, 0.0f));
+        glassModel = glm::scale(glassModel, glm::vec3(2.0f));
+
+        glm::mat4 groundMVP = projView * glassModel;
+
+        m_resources.texture.use();
+        m_glassTexture.use();
+        glUniformMatrix4fv(m_resources.mvpLocationTexture, 1, GL_FALSE, &groundMVP[0][0]);
+
+        m_glass.draw();
+    }
+
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+
 }
 
 void SceneStencil::updateInput(Window& w, double dt)
