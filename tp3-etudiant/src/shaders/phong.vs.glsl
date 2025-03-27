@@ -51,4 +51,16 @@ layout (std140) uniform LightingBlock
 void main()
 {
     // TODO
+    vec3 positionInView = (modelView * vec4(position, 1.0)).xyz;
+    attribOut.normal = normalMatrix * normal;
+    attribOut.obsPos = -positionInView;
+    
+    for (int i = 0; i < 3; i++) {
+        vec3 lightPosInView = (view * vec4(lights[i].position, 1.0)).xyz;
+        attribOut.lightDir[i] = lightPosInView - positionInView;
+        attribOut.spotDir[i] = mat3(view) * lights[i].spotDirection;
+    }
+    
+    attribOut.texCoords = texCoords;
+    gl_Position = mvp * vec4(position, 1.0);
 }
