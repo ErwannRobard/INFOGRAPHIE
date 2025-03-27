@@ -48,7 +48,55 @@ layout (std140) uniform LightingBlock
     float spotOpeningAngle;
 };
 
+
+float computeSpotFactor(vec3 lightDirection, vec3 spotDirectionView, float spotAngleCosine, float spotInnerAngleCosine)
+{
+    float spotDotProduct = dot(-lightDirection, spotDirectionView);
+    return (spotDotProduct < spotAngleCosine) ? 0.0 : mix(pow(spotDotProduct, spotExponent), smoothstep(spotAngleCosine, spotInnerAngleCosine, spotDotProduct), float(useDirect3D));
+}
+
+vec3 computeSpecular(vec3 lightDirection, vec3 viewDirection, vec3 normal, vec3 lightSpecular)
+{
+    float specularFactor = useBlinn ? dot(normalize(lightDirection + viewDirection), normal) : dot(reflect(-lightDirection, normal), viewDirection);
+    return mat.specular * lightSpecular * pow(max(specularFactor, 0.0), mat.shininess);
+}
+
+void computeLighting(vec3 transformedPosition, vec3 viewDirection, vec3 transformedNormal, out vec3 computedAmbient, out vec3 computedDiffuse, out vec3 computedSpecular)
+{
+    computedAmbient = mat.ambient * (lightModelAmbient + lights[0].ambient + lights[1].ambient + lights[2].ambient);
+    computedDiffuse = vec3(0.0);
+    computedSpecular = vec3(0.0);
+
+    float spotAngleCosine = cos(radians(spotOpeningAngle));
+    float spotInnerAngleCosine = min(spotAngleCosine * 2.0, 1.0);
+
+    for (int i = 0; i < 3; i++) {
+        vec3 lightPositionInView = (view * vec4(lights[i].position, 1.0)).xyz;
+        vec3 lightDirection = normalize(lightPositionInView - transformedPosition);
+        float normalDotLight = max(dot(transformedNormal, lightDirection), 0.0);
+
+        float spotFactor = useSpotlight ? computeSpotFactor(lightDirection, normalize((view * vec4(lights[i].spotDirection, 0.0)).xyz), spotAngleCosine, spotInnerAngleCosine) : 1.0;
+
+        computedDiffuse += mat.diffuse * lights[i].diffuse * normalDotLight * spotFactor;
+        if (normalDotLight > 0.0) {
+            computedSpecular += computeSpecular(lightDirection, viewDirection, transformedNormal, lights[i].specular) * spotFactor;
+        }
+    }
+}
+
 void main()
 {
-    // TODO
+    vec3 transformedPosition = (modelView * vec4(position, 1)).xyz;
+    vec3 viewDirection = normalize(-transformedPosition);
+    vec3 transformedNormal = normalize(normalMatrix * normal);
+
+    vec3 computedAmbient, computedDiffuse, computedSpecular;
+    computeLighting(transformedPosition, viewDirection, transformedNormal, computedAmbient, computedDiffuse, computedSpecular);
+
+    gl_Position = mvp * vec4(position, 1);
+    attribOut.texCoords = texCoords;
+    attribOut.ambient = computedAmbient;
+    attribOut.diffuse = computedDiffuse;
+    attribOut.specular = computedSpecular;
+    attribOut.emission = mat.emission;
 }
