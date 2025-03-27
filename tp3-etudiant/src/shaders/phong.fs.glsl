@@ -45,7 +45,7 @@ uniform sampler2D specularSampler;
 out vec4 FragColor;
 
 
-//Spot factor for OpenGl or Direct3D 
+//Spot factor for OpenGl and Direct3D 
 float computeSpotFactor(vec3 lightDirection, vec3 spotDirection, float spotAngleCosine)
 {
     vec3 L = normalize(lightDirection);
@@ -58,8 +58,10 @@ float computeSpotFactor(vec3 lightDirection, vec3 spotDirection, float spotAngle
     }
     
     if (useDirect3D) {
-        float spotInnerAngleCosine = pow(spotAngleCosine, 1.01 + spotExponent/2.0);
-        return smoothstep(spotAngleCosine, spotInnerAngleCosine, spotDotProduct);
+        float cosInner = spotAngleCosine;
+        float cosOuter = pow(spotAngleCosine, 1.01 + spotExponent/2.0);
+        
+        return smoothstep(cosOuter, cosInner, spotDotProduct);
     } else {
         return pow(spotDotProduct, spotExponent);
     }

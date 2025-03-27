@@ -10,8 +10,12 @@ out ATTRIB_OUT
 } attribOut;
 
 uniform mat4 mvp;
+uniform mat4 modelView;
 
 void main()
 {
     // TODO
+    attribOut.position = (modelView * vec4(position, 1.0)).xyz;
+    attribOut.texCoords = texCoords;
+    gl_Position = mvp * vec4(position, 1.0);
 }
