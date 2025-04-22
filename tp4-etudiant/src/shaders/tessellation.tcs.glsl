@@ -32,10 +32,10 @@ void main()
     float mix2 = smoothstep(MIN_DIST, MAX_DIST, clamp(distance2, MIN_DIST, MAX_DIST));
     float mix3 = smoothstep(MIN_DIST, MAX_DIST, clamp(distance3, MIN_DIST, MAX_DIST));
 
-    gl_TessLevelOuter[0] = mix(MAX_TESS, MIN_TESS, 1 - mix0);
-    gl_TessLevelOuter[1] = mix(MAX_TESS, MIN_TESS, 1 - mix1);
-    gl_TessLevelOuter[2] = mix(MAX_TESS, MIN_TESS, 1 - mix2);
-    gl_TessLevelOuter[3] = mix(MAX_TESS, MIN_TESS, 1 - mix3);
+    gl_TessLevelOuter[0] = mix(MAX_TESS, MIN_TESS, mix0);
+    gl_TessLevelOuter[1] = mix(MAX_TESS, MIN_TESS, mix1);
+    gl_TessLevelOuter[2] = mix(MAX_TESS, MIN_TESS, mix2);
+    gl_TessLevelOuter[3] = mix(MAX_TESS, MIN_TESS, mix3);
 
     gl_TessLevelInner[0] = max(gl_TessLevelOuter[0], gl_TessLevelOuter[3]);
     gl_TessLevelInner[1] = max(gl_TessLevelOuter[0], gl_TessLevelOuter[2]);

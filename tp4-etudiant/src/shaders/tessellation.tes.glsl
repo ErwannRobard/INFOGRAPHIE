@@ -40,9 +40,7 @@ void main()
     vec4 p3 = gl_in[3].gl_Position;
     vec4 position = interpole(p0, p1, p2, p3);
 
-    vec2 texCoord = (position.xz + vec2(PLANE_SIZE * 0.5)) / PLANE_SIZE;
-    vec2 texCoordHeight = texCoord / 4.0;
-    attribOut.texCoords = texCoord;
+    vec2 texCoordHeight = (position.xz + vec2(PLANE_SIZE * 0.5)) / (PLANE_SIZE * 4.0);
 
     float texel = texture(heighmapSampler, texCoordHeight).r;
     float height = texel * 64 - 32;
@@ -52,4 +50,7 @@ void main()
     gl_Position = mvp * position;
 
     attribOut.patchDistance = vec4(gl_TessCoord.xy, 1.0 - gl_TessCoord.xy);
+    attribOut.texCoords = gl_TessCoord.xy * 2.0;
+
+
 }
