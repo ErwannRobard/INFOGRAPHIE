@@ -40,8 +40,8 @@ void main()
 	// TODO
     float height = attribIn.height;
 
-    float sandGrassFactor  = smoothstep(0.3, 0.4, height);
-    float sandGrassSnowFactor = smoothstep(0.6, 0.7, height);
+    float sandGrassFactor  = smoothstep(0.35, 0.4, height);
+    float sandGrassSnowFactor = smoothstep(0.6, 0.65, height);
     
     vec4 sandTex  = texture(sandSampler, attribIn.texCoords);
     vec4 grassTex = texture(groundSampler, attribIn.texCoords);
@@ -59,6 +59,6 @@ void main()
         finalColor = mix(PATCH_EDGE_COLOR, finalColor, patchFactor);
         FragColor = vec4(finalColor, 1.0);
     } else {
-        FragColor = vec4(sandGrassSnowTex.rgb, 1.0);
+        FragColor = vec4(baseColor, 1.0);
     }
 }
