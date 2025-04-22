@@ -14,7 +14,14 @@ out ATTRIB_VS_OUT
     vec2 size;
 } attribOut;
 
+out vec3 vs_out_position_view;
+
 void main()
 {
     // TODO
+    vec4 positionView = modelView * vec4(position, 1.0);
+    vs_out_position_view = positionView.xyz / positionView.w;
+
+    attribOut.color = color;
+    attribOut.size = size;
 }

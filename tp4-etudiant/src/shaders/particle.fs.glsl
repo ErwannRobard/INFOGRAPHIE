@@ -14,4 +14,14 @@ in ATTRIB_GS_OUT
 void main()
 {
     // TODO
+    //sample flame texture
+    vec4 texColor = texture(textureSampler, attribIn.texCoords);
+
+    //discard lorsque l’alpha des texels est plus petit que 0.05
+    if (texColor.a < 0.05) {
+        discard;
+    }
+
+    //La couleur finale est le texel teinté par l’attribut couleur
+    FragColor = texColor * attribIn.color;
 }

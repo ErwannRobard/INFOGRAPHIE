@@ -12,7 +12,6 @@
 #include <iostream>
 
 
-
 static const unsigned int MAX_N_PARTICULES = 1000;
 static Particle particles[MAX_N_PARTICULES] = { {{0,0,0},{0,0,0},{0,0,0,0}, {0,0},0} };
 
@@ -40,21 +39,85 @@ SceneParticles::SceneParticles(bool& isMouseMotionEnabled)
     initializeTexture();
 
     glEnable(GL_PROGRAM_POINT_SIZE);
-    
+    CHECK_GL_ERROR;
     // TODO
+
+    glGenBuffers(2, m_vbo);
+    CHECK_GL_ERROR;
+    glGenVertexArrays(1, &m_vao);
+    CHECK_GL_ERROR;
+    glGenTransformFeedbacks(1, &m_tfo);
+    CHECK_GL_ERROR;
+
+    //init VBO VAO
+    GLsizeiptr particleDataSize = m_nMaxParticles * sizeof(Particle);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, particleDataSize, NULL, GL_STREAM_DRAW);
+    CHECK_GL_ERROR;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, particleDataSize, NULL, GL_STREAM_DRAW);
+    CHECK_GL_ERROR;
+
+    glBindVertexArray(m_vao);
+    CHECK_GL_ERROR;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
+    CHECK_GL_ERROR;
+
+    //1 stride = 1 particle struct of 52 bytes
+    GLsizei stride = sizeof(Particle);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);  //position
+    glEnableVertexAttribArray(0);
+    CHECK_GL_ERROR;
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)12); //veclocity, vec3 12 bytes from position
+    glEnableVertexAttribArray(1);
+    CHECK_GL_ERROR;
+
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, stride, (void*)24); //color, vec3 12 bytes from velocity
+    glEnableVertexAttribArray(2);
+    CHECK_GL_ERROR;
+
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride, (void*)40); //size, vec4 16 byte from color
+    glEnableVertexAttribArray(3);
+    CHECK_GL_ERROR;
+
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, stride, (void*)48); //timeToLive, vec2 8 byte from size
+    glEnableVertexAttribArray(4);
+    CHECK_GL_ERROR;
+
+    //unbind
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    CHECK_GL_ERROR;
+
+    //TFO
+    glGenTransformFeedbacks(1, &m_tfo);
+    CHECK_GL_ERROR;
+    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
+    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+    CHECK_GL_ERROR;
 }
 
 SceneParticles::~SceneParticles()
 {
     // TODO
+    glDeleteBuffers(2, m_vbo);
+    CHECK_GL_ERROR;
+    glDeleteVertexArrays(1, &m_vao);
+    CHECK_GL_ERROR;
+    glDeleteTransformFeedbacks(1, &m_tfo);
+    CHECK_GL_ERROR;
 }
 
 void SceneParticles::run(Window& w, double dt)
 {
     updateInput(w, dt);
-    
     drawMenu();
-    
+
     glm::mat4 view = getCameraThirdPerson(2.5);
     glm::mat4 projPersp = getProjectionMatrix(w);
     glm::mat4 modelView = view;
@@ -64,23 +127,72 @@ void SceneParticles::run(Window& w, double dt)
     if (dt == 0.0f)
         m_nParticles = 1;
 
+    //Double Buffering avec static local variable to track the source buffer index across frames
+    static int currentSourceBuffer = 0; //Buffer to READ from
+    int destinationBuffer = 1 - currentSourceBuffer; //Buffer to WRITE
+
+    //Transform Feedback
     m_transformFeedbackShaderProgram.use();
     glUniform1f(m_timeLocationTransformFeedback, m_totalTime);
     glUniform1f(m_dtLocationTransformFeedback, (float)dt);
-    
+
     // TODO: buffer binding
-    // TODO: update particles
-    // TODO: swap buffers
+    // TODO: update particles (glDrawArrays)
+
+    glBindVertexArray(m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[currentSourceBuffer]); //reaad from current source
+    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_vbo[destinationBuffer]); //write to destination
+
+    glEnable(GL_RASTERIZER_DISCARD);
+
+    glBeginTransformFeedback(GL_POINTS);
+    glDrawArrays(GL_POINTS, 0, m_nParticles);
+    glEndTransformFeedback();
+
+    glDisable(GL_RASTERIZER_DISCARD);
+
+    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+    //keep VAO bound, but unbind ARRAY_BUFFER, will rebind for drawing
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+    // TODO: swap buffers 
+    //buffer we just wrote to (destinationBuffer) becomes the source for drawing current frame, then source of next frame<s update
+    currentSourceBuffer = destinationBuffer;
+
 
     m_particleShaderProgram.use();
     m_flameTexture.use(0);
-    
+
     glUniformMatrix4fv(m_modelViewLocationParticle, 1, GL_FALSE, &modelView[0][0]);
     glUniformMatrix4fv(m_projectionLocationParticle, 1, GL_FALSE, &projPersp[0][0]);
 
     // TODO: buffer binding
     // TODO: Draw particles without depth write and with blending
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
+
+    //Bind 
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[currentSourceBuffer]); //read from the buffer that was just updated
+
+    //draw the updated particles as points
+    glDrawArrays(GL_POINTS, 0, m_nParticles);
+
+    //restore render
+    glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
+
+    //unbind at end
+    glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+    //update nmb particule
     if (m_cumulativeTime > 1.0f / 60.0f)
     {
         m_cumulativeTime = 0.0f;
@@ -123,7 +235,6 @@ void SceneParticles::drawMenu()
 
 void SceneParticles::initializeShader()
 {
-    // Particule shader
     {
         std::string vertexCode = readFile("shaders/particle.vs.glsl");
         std::string geometryCode = readFile("shaders/particle.gs.glsl");
@@ -137,10 +248,11 @@ void SceneParticles::initializeShader()
         m_particleShaderProgram.attachShaderObject(fragment);
         m_particleShaderProgram.link();
 
+        m_particleShaderProgram.use();
         m_modelViewLocationParticle = m_particleShaderProgram.getUniformLoc("modelView");
         m_projectionLocationParticle = m_particleShaderProgram.getUniformLoc("projection");
     }
-    
+
     // Transform feedback shader
     {
         std::string vertexCode = readFile("shaders/transformFeedback.vs.glsl");
@@ -149,9 +261,16 @@ void SceneParticles::initializeShader()
         m_transformFeedbackShaderProgram.attachShaderObject(vertex);
 
         // TODO
-        
+        //utiliser la méthode setTransformFeedbackVaryings avant de faire le link
+        const char* varyings[] = {
+            "positionMod", "velocityMod", "colorMod", "sizeMod", "timeToLiveMod"
+        };
+        m_transformFeedbackShaderProgram.setTransformFeedbackVaryings(varyings, 5, GL_INTERLEAVED_ATTRIBS);
+
         m_transformFeedbackShaderProgram.link();
 
+        //use program to get uniform locations
+        m_transformFeedbackShaderProgram.use();
         m_timeLocationTransformFeedback = m_transformFeedbackShaderProgram.getUniformLoc("time");
         m_dtLocationTransformFeedback = m_transformFeedbackShaderProgram.getUniformLoc("dt");
     }
